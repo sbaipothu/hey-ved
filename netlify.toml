@@ -1,0 +1,13 @@
+[
+  {
+    "path": "/api/*",
+    "method": "POST",
+    "function": "send-reservation"
+  },
+  {
+    "path": "/*",
+    "method": "GET",
+    "static": true,
+    "status": 200
+  }
+]
