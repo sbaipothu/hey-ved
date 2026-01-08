@@ -1,13 +1,8 @@
-[
-  {
-    "path": "/api/*",
-    "method": "POST",
-    "function": "send-reservation"
-  },
-  {
-    "path": "/*",
-    "method": "GET",
-    "static": true,
-    "status": 200
-  }
-]
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/api/send-reservation"
+  to = "/.netlify/functions/send-reservation"
+  status = 200
