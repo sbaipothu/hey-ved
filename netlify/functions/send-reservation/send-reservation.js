@@ -1,19 +1,19 @@
 // Netlify function for sending reservation emails
 import nodemailer from 'nodemailer';
 
-export default async function handler(event, context) {
+export default async (event, context) => {
   if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
   const { name, contact, date, description } = JSON.parse(event.body || '{}');
   if (!name || !contact || !description) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Missing required fields' })
-    };
+    return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
   try {
     let transporter = nodemailer.createTransport({
@@ -30,14 +30,14 @@ export default async function handler(event, context) {
       text: `Name: ${name}\nContact: ${contact}\nEvent Date: ${date || 'Not Provided'}\nDescription: ${description}`
     };
     await transporter.sendMail(mailOptions);
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ success: true })
-    };
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
   } catch (e) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to send email' })
-    };
+    return new Response(JSON.stringify({ error: 'Failed to send email' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
-}
+};
