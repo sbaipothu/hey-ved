@@ -1,20 +1,26 @@
 // Netlify function for sending reservation emails
 import nodemailer from 'nodemailer';
 
-export default async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+export default async function handler(event, context) {
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ error: 'Method not allowed' })
+    };
   }
-  const { name, contact, date, description } = req.body;
+  const { name, contact, date, description } = JSON.parse(event.body || '{}');
   if (!name || !contact || !description) {
-    return res.status(400).json({ error: 'Missing required fields' });
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Missing required fields' })
+    };
   }
   try {
     let transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: 'info.heyved@gmail.com',
-        pass: process.env.GMAIL_APP_PASSWORD // Use Netlify environment variable
+        pass: process.env.GMAIL_APP_PASSWORD
       }
     });
     const mailOptions = {
@@ -24,8 +30,14 @@ export default async (req, res) => {
       text: `Name: ${name}\nContact: ${contact}\nEvent Date: ${date || 'Not Provided'}\nDescription: ${description}`
     };
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ success: true });
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true })
+    };
   } catch (e) {
-    res.status(500).json({ error: 'Failed to send email' });
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Failed to send email' })
+    };
   }
-};
+}
